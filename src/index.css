@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   中式书卷风 · 主题变量 + 全局基础样式
+   深色（默认）：暖灰深色基底 + 低饱和朱砂红
+   浅色：米白宣纸色，保留朱砂红/淡赭石/哑光金
+   ============================================================ */
+
+/* 深色主题（默认） */
+:root, [data-theme='dark'] {
+  --c-base: 30 26 24;      /* #1e1a18 */
+  --c-ink: 35 32 29;        /* #23201d */
+  --c-nav: 42 36 33;        /* #2a2421 */
+  --c-cream: 245 237 227;   /* #f5ede3 */
+  --c-muted: 138 122 109;   /* #8a7a6d */
+  --c-ochre: 166 122 106;   /* #a67a6a */
+  --c-gold: 184 160 138;    /* #b8a08a */
+  --grid-opacity: 0.08;                      /* 斜纹网格透明度 */
+  --c-hover: rgba(255, 255, 255, 0.05);      /* 悬浮背景 */
+  --c-divider: rgba(255, 255, 255, 0.05);    /* 分隔线 */
+  --c-field: rgba(0, 0, 0, 0.25);            /* 输入框背景 */
+  color-scheme: dark;
+}
+
+/* 浅色主题（米白宣纸）——赭石/金加深，保证浅底上的文字对比度 */
+[data-theme='light'] {
+  --c-base: 245 239 230;   /* #f5efe6 */
+  --c-ink: 250 245 236;    /* #faf5ec */
+  --c-nav: 255 255 255;    /* #ffffff */
+  --c-cream: 58 50 41;     /* #3a3229 */
+  --c-muted: 120 104 90;   /* 稍深的次要文字 */
+  --c-ochre: 138 90 70;    /* 加深的赭石 */
+  --c-gold: 150 118 88;    /* 加深的哑光金 */
+  --grid-opacity: 0.06;
+  --c-hover: rgba(0, 0, 0, 0.05);
+  --c-divider: rgba(0, 0, 0, 0.08);
+  --c-field: rgba(0, 0, 0, 0.04);
+  color-scheme: light;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--c-base));
+  color: rgb(var(--c-cream));
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* 极淡斜纹网格（宣纸/古籍底纹）+ 缓慢漂移 */
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(184, 160, 138, var(--grid-opacity)) 0px,
+    rgba(184, 160, 138, var(--grid-opacity)) 1px,
+    transparent 1px,
+    transparent 18px
+  );
+  background-size: 200% 200%;
+  animation: grid-drift 30s ease-in-out infinite;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* 标题字体：方正金陵风格（宋体/明体） */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'FangZheng JinLing', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', SimSun, serif;
+}
+
+/* 原生表单控件：文字/背景跟随主题，避免"深色框黑字"看不清 */
+select option {
+  background-color: rgb(var(--c-nav));
+  color: rgb(var(--c-cream));
+}
+input::placeholder, textarea::placeholder {
+  color: rgb(var(--c-muted));
+  opacity: 0.7;
+}
+/* 日期/时间选择器图标：由 color-scheme 自动跟随主题（不要再用 filter 反转，避免双重反转变黑） */
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(184, 160, 138, 0.25); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(184, 160, 138, 0.4); }
+
+/* 尊重系统"减少动效"偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== 可复用组件类 ===== */
+@layer components {
+  .ink-card {
+    @apply rounded-card bg-nav shadow-inner-glow border border-divider;
+    transition: background-color 0.35s ease;
+  }
+  .btn-cinnabar {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-card px-4 py-2 text-sm font-medium text-onaccent bg-cinnabar transition-all duration-150;
+  }
+  .btn-cinnabar:hover {
+    background-color: #a04a3a;
+    box-shadow: 0 0 20px rgba(140, 58, 48, 0.3);
+  }
+  .btn-cinnabar:active { transform: scale(0.97); }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-card px-4 py-2 text-sm text-cream/80 border border-gold/30 transition-all duration-150 hover:bg-gold/10 hover:border-gold/60;
+  }
+  .btn-ghost:active { transform: scale(0.97); }
+  .field {
+    @apply w-full rounded-card bg-field border border-gold/25 px-3 py-2 text-sm text-cream placeholder:text-muted/50 outline-none transition-colors duration-200;
+  }
+  .field:focus { border-color: #8c3a30; box-shadow: 0 0 0 1px rgba(140, 58, 48, 0.5); }
+  .lbl {
+    @apply block text-xs text-muted mb-1;
+  }
+  .brush-line {
+    @apply h-px bg-gradient-to-r from-cinnabar/70 to-transparent;
+  }
+  .seal-dot {
+    @apply inline-block w-2 h-2 rounded-full bg-cinnabar;
+  }
+}
